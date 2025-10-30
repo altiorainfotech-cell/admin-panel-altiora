@@ -10,7 +10,8 @@ export function useAllCategories() {
     { name: 'Design', id: 'design' },
     { name: 'Company', id: 'company' },
     { name: 'Technology', id: 'technology' },
-    { name: 'Development', id: 'development' }
+    { name: 'Development', id: 'development' },
+    { name: 'WEB3', id: 'web3' }
   ]
 
   return {

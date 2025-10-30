@@ -66,6 +66,38 @@ export class BlogCacheManager {
       const slug = post.href.replace('/blog/', '');
       this.invalidatePost(slug);
     }
+
+    // Also trigger Altiora website revalidation
+    this.triggerAltioraRevalidation();
+  }
+
+  /**
+   * Trigger revalidation on Altiora website
+   */
+  static async triggerAltioraRevalidation(): Promise<void> {
+    try {
+      const altioraUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+      
+      // Don't await this to avoid blocking the main operation
+      fetch(`${altioraUrl}/api/revalidate?path=/blog`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Add timeout to prevent hanging
+        signal: AbortSignal.timeout(3000)
+      }).then(response => {
+        if (response.ok) {
+          console.log('✅ Successfully triggered Altiora blog revalidation');
+        } else {
+          console.log('⚠️ Altiora revalidation failed:', response.status);
+        }
+      }).catch(error => {
+        console.log('⚠️ Could not trigger Altiora revalidation:', error.message);
+      });
+    } catch (error) {
+      console.log('⚠️ Error setting up Altiora revalidation:', error);
+    }
   }
 
   /**
