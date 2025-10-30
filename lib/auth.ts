@@ -20,7 +20,7 @@ export const authOptions: NextAuthOptions = {
           console.log('Missing credentials')
           return null
         }
-
+/////hahahhahahaha
         try {
           // Ensure MongoDB connection
           if (mongoose.connection.readyState !== 1) {
