@@ -55,11 +55,21 @@ export function BlogImageUpload({
       formData.append('file', file)
       formData.append('isFeaturedImage', 'true')
 
-      // Upload to API
+      // Get CSRF token
+      const csrfToken = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('csrf-token='))
+        ?.split('=')[1]
+
+      // Upload to API with enhanced headers
       const response = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
-        credentials: 'include'
+        credentials: 'include',
+        headers: {
+          'X-CSRF-Token': csrfToken || '',
+          'X-Requested-With': 'XMLHttpRequest'
+        }
       })
 
       const data = await response.json()

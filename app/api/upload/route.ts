@@ -1,19 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 import { uploadToCloudinary } from '@/lib/cloudinary';
+import { debugAuthToken } from '@/lib/auth-debug';
 
 export async function POST(request: NextRequest) {
   try {
-    // Check authentication
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET
-    });
+    // Debug authentication in production
+    const token = await debugAuthToken(request);
 
     if (!token) {
+      // Try alternative authentication method
+      const sessionCookie = request.cookies.get(
+        process.env.NODE_ENV === 'production' 
+          ? '__Secure-next-auth.session-token' 
+          : 'next-auth.session-token'
+      );
+      
+      console.log('Fallback auth check:', {
+        hasSessionCookie: !!sessionCookie,
+        cookieValue: sessionCookie?.value ? 'present' : 'missing'
+      });
+
       return NextResponse.json({
         success: false,
-        error: 'Authentication required'
+        error: 'Authentication required. Please log in again.',
+        debug: {
+          environment: process.env.NODE_ENV,
+          hasSecret: !!process.env.NEXTAUTH_SECRET,
+          hasSessionCookie: !!sessionCookie
+        }
       }, { status: 401 });
     }
 
@@ -81,16 +96,17 @@ export async function POST(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
-    // Check authentication
+    // Check authentication with proper cookie name for production
     const token = await getToken({
       req: request,
-      secret: process.env.NEXTAUTH_SECRET
+      secret: process.env.NEXTAUTH_SECRET,
+      cookieName: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token'
     });
 
     if (!token) {
       return NextResponse.json({
         success: false,
-        error: 'Authentication required'
+        error: 'Authentication required. Please log in again.'
       }, { status: 401 });
     }
 

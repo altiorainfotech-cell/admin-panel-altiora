@@ -76,7 +76,8 @@ export const authOptions: NextAuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        domain: process.env.NODE_ENV === 'production' ? '.altiorainfotech.com' : undefined
+        // Remove domain restriction to fix cookie issues
+        domain: undefined
       }
     }
   },
