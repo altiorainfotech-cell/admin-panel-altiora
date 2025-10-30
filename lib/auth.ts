@@ -117,11 +117,6 @@ export const authOptions: NextAuthOptions = {
         }, null, 2))
       }
       
-      // Clear token on signout
-      if (trigger === 'signOut') {
-        return {}
-      }
-      
       return token
     },
     async session({ session, token }) {
@@ -140,11 +135,6 @@ export const authOptions: NextAuthOptions = {
       }
       // Session updated
       return session
-    },
-    async signOut({ token }) {
-      // Clear token data on signout
-      console.log('SignOut callback - clearing token')
-      return true
     }
   },
   pages: {
