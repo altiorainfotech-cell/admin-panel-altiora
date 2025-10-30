@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { useSession, signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { usePathname } from 'next/navigation'
 import { LogOut, User, ChevronDown, Bell, Search } from 'lucide-react'
+import { performCompleteLogout } from '@/lib/logout-utils'
 
 const getPageTitle = (pathname: string) => {
   const segments = pathname.split('/').filter(Boolean)
@@ -20,30 +21,7 @@ export default function AdminHeader() {
   const pageTitle = getPageTitle(pathname)
 
   const handleLogout = async () => {
-    try {
-      // Clear JWT token
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-        credentials: 'include'
-      })
-    } catch (logError) {
-      console.error('Failed to clear JWT token:', logError)
-    }
-
-    try {
-      // Use signOut with explicit redirect to admin login
-      const result = await signOut({ 
-        callbackUrl: '/admin/login',
-        redirect: false // Handle redirect manually for better control
-      })
-      
-      // Manual redirect to ensure we go to admin login
-      window.location.href = '/admin/login'
-    } catch (error) {
-      console.error('Logout error:', error)
-      // Fallback: manual redirect if signOut fails
-      window.location.href = '/admin/login'
-    }
+    await performCompleteLogout()
   }
 
   return (

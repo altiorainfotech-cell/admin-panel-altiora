@@ -76,14 +76,33 @@ export const authOptions: NextAuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: process.env.NODE_ENV === 'production',
-        // Remove domain restriction to fix cookie issues
+        domain: undefined
+      }
+    },
+    csrfToken: {
+      name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.csrf-token' : 'next-auth.csrf-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        domain: undefined
+      }
+    },
+    callbackUrl: {
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.callback-url' : 'next-auth.callback-url',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
         domain: undefined
       }
     }
   },
   useSecureCookies: process.env.NODE_ENV === 'production',
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
       // JWT callback processed
       if (user) {
         token.userId = user.id
@@ -97,6 +116,12 @@ export const authOptions: NextAuthOptions = {
           permissions: token.permissions
         }, null, 2))
       }
+      
+      // Clear token on signout
+      if (trigger === 'signOut') {
+        return {}
+      }
+      
       return token
     },
     async session({ session, token }) {
@@ -116,6 +141,11 @@ export const authOptions: NextAuthOptions = {
       // Session updated
       return session
     },
+    async signOut({ token }) {
+      // Clear token data on signout
+      console.log('SignOut callback - clearing token')
+      return true
+    }
   },
   pages: {
     signIn: "/admin/login",

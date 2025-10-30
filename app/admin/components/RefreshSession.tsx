@@ -1,13 +1,10 @@
 'use client'
 
-import { signOut, signIn } from 'next-auth/react'
+import { performCompleteLogout } from '@/lib/logout-utils'
 
 export default function RefreshSession() {
   const handleRefreshSession = async () => {
-    // Sign out and then redirect to login
-    await signOut({ redirect: false })
-    // Redirect to login page
-    window.location.href = '/admin/login'
+    await performCompleteLogout()
   }
 
   return (
