@@ -10,8 +10,6 @@ export enum Status {
   INACTIVE = 'inactive'
 }
 
-/////testing
-
 // Permission types
 export type PermissionLevel = 'none' | 'read' | 'write' | 'full'
 
