@@ -15,7 +15,8 @@ import {
   MessageSquare,
   UserCheck,
   Activity,
-  Search
+  Search,
+  Layers
 } from 'lucide-react'
 import { canAccessPage } from '@/lib/permissions'
 import { IPermissions } from '@/lib/models/AdminUser'
@@ -25,6 +26,7 @@ const navigationItems = [
   { name: 'Blog Posts', href: '/admin/blogs', icon: FileText, permission: 'blogs' as keyof IPermissions },
   { name: 'FAQ', href: '/admin/FAQ', icon: FileText, permission: 'FAQ' as keyof IPermissions },
   { name: 'Staff', href: '/admin/staff', icon: UserCheck, permission: 'staff' as keyof IPermissions },
+  { name: 'Services', href: '/admin/services', icon: Layers, permission: 'services' as keyof IPermissions },
   { name: 'Messages', href: '/admin/messages', icon: MessageSquare, permission: 'messages' as keyof IPermissions },
   { name: 'Admin Users', href: '/admin/users', icon: Users, permission: 'users' as keyof IPermissions },
   { name: 'Activity Logs', href: '/admin/activity-logs', icon: Activity, permission: 'activity' as keyof IPermissions },

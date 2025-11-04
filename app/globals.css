@@ -105,3 +105,85 @@ body {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Admin panel theme matching */
+.admin-panel-theme {
+  --background: #0f172a !important;
+  --foreground: #ffffff !important;
+  --card: #1e293b !important;
+  --card-foreground: #ffffff !important;
+  --popover: #1e293b !important;
+  --popover-foreground: #ffffff !important;
+  --secondary: #334155 !important;
+  --secondary-foreground: #ffffff !important;
+  --muted: #475569 !important;
+  --muted-foreground: #cbd5e1 !important;
+  --accent: #334155 !important;
+  --accent-foreground: #ffffff !important;
+  --border: #475569 !important;
+  --input: #1e293b !important;
+  background: linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a) !important;
+  color: #ffffff !important;
+}
+
+.admin-panel-theme * {
+  border-color: #475569 !important;
+}
+
+.admin-panel-theme .bg-white {
+  background-color: #1e293b !important;
+}
+
+.admin-panel-theme .bg-gray-50 {
+  background-color: #0f172a !important;
+}
+
+.admin-panel-theme .bg-gray-100 {
+  background-color: #334155 !important;
+}
+
+.admin-panel-theme .text-gray-900 {
+  color: #ffffff !important;
+}
+
+.admin-panel-theme .text-gray-600 {
+  color: #cbd5e1 !important;
+}
+
+.admin-panel-theme .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+.admin-panel-theme input,
+.admin-panel-theme textarea {
+  background-color: #334155 !important;
+  border-color: #475569 !important;
+  color: #ffffff !important;
+}
+
+.admin-panel-theme input::placeholder,
+.admin-panel-theme textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+.admin-panel-theme input:focus,
+.admin-panel-theme textarea:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2) !important;
+}
+
+.admin-panel-theme .bg-blue-50 {
+  background-color: #1e40af !important;
+}
+
+.admin-panel-theme .bg-green-50 {
+  background-color: #166534 !important;
+}
+
+.admin-panel-theme .border-blue-200 {
+  border-color: #3b82f6 !important;
+}
+
+.admin-panel-theme .border-green-200 {
+  border-color: #22c55e !important;
+}

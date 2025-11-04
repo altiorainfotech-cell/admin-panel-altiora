@@ -34,7 +34,8 @@ export const ADMIN_PAGES = {
   messages: { label: 'Messages', description: 'View and manage contact messages' },
   settings: { label: 'Settings', description: 'Account settings and preferences' },
   activity: { label: 'Activity Logs', description: 'View system activity and audit logs' },
-  seo: { label: 'SEO Management', description: 'Manage website SEO metadata and redirects' }
+  seo: { label: 'SEO Management', description: 'Manage website SEO metadata and redirects' },
+  services: { label: 'Services Management', description: 'Manage Web2, Web3, and AI-ML services content' }
 };
 
 export const DEFAULT_PERMISSIONS: Record<'admin' | 'seo' | 'custom', IPermissions> = {
@@ -46,7 +47,8 @@ export const DEFAULT_PERMISSIONS: Record<'admin' | 'seo' | 'custom', IPermission
     messages: 'full',
     settings: 'full',
     activity: 'full',
-    seo: 'full'
+    seo: 'full',
+    services: 'full'
   },
   seo: {
     dashboard: true,
@@ -56,7 +58,8 @@ export const DEFAULT_PERMISSIONS: Record<'admin' | 'seo' | 'custom', IPermission
     messages: 'read',
     settings: 'full',
     activity: 'read',
-    seo: 'full'
+    seo: 'full',
+    services: 'read'
   },
   custom: {
     dashboard: true,
@@ -66,7 +69,8 @@ export const DEFAULT_PERMISSIONS: Record<'admin' | 'seo' | 'custom', IPermission
     messages: 'none',
     settings: 'full',
     activity: 'none',
-    seo: 'none'
+    seo: 'none',
+    services: 'none'
   }
 };
 
@@ -128,7 +132,8 @@ export function validatePermissions(permissions: Partial<IPermissions>): IPermis
     messages: 'none',
     settings: 'full', // Settings is always accessible to all users
     activity: 'none',
-    seo: 'none'
+    seo: 'none',
+    services: 'none'
   };
 
   // Validate each permission

@@ -1,146 +1,77 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
-import { uploadToCloudinary } from '@/lib/cloudinary';
-import { debugAuthToken } from '@/lib/auth-debug';
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { hasPermission } from '@/lib/permissions'
+import { IPermissions } from '@/lib/models/AdminUser'
 
 export async function POST(request: NextRequest) {
   try {
-    // Debug authentication in production
-    const token = await debugAuthToken(request);
-
-    if (!token) {
-      // Try alternative authentication method
-      const sessionCookie = request.cookies.get(
-        process.env.NODE_ENV === 'production' 
-          ? '__Secure-next-auth.session-token' 
-          : 'next-auth.session-token'
-      );
-      
-      console.log('Fallback auth check:', {
-        hasSessionCookie: !!sessionCookie,
-        cookieValue: sessionCookie?.value ? 'present' : 'missing'
-      });
-
-      return NextResponse.json({
-        success: false,
-        error: 'Authentication required. Please log in again.',
-        debug: {
-          environment: process.env.NODE_ENV,
-          hasSecret: !!process.env.NEXTAUTH_SECRET,
-          hasSessionCookie: !!sessionCookie
-        }
-      }, { status: 401 });
-    }
-
-    if (token.status !== 'active') {
-      return NextResponse.json({
-        success: false,
-        error: 'Account is disabled'
-      }, { status: 403 });
-    }
-
-    // Parse form data
-    const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const session = await getServerSession(authOptions)
     
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const user = session.user as any
+    const userRole = user.role as 'admin' | 'seo' | 'custom'
+    const userPermissions = user.permissions as IPermissions | undefined
+
+    // Check if user has write permissions for services (or any write permission)
+    if (!hasPermission(userPermissions, userRole, 'services', 'write') && 
+        !hasPermission(userPermissions, userRole, 'blogs', 'write')) {
+      return NextResponse.json({ error: 'Insufficient permissions' }, { status: 403 })
+    }
+
+    const formData = await request.formData()
+    const file = formData.get('file') as File
+
     if (!file) {
-      return NextResponse.json({
-        success: false,
-        error: 'No file provided'
-      }, { status: 400 });
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Validate file type and size
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-    const maxSize = 10 * 1024 * 1024; // 10MB
-
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({
-        success: false,
-        error: 'Invalid file type. Only JPEG, PNG, WebP, and GIF images are allowed.'
-      }, { status: 400 });
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      return NextResponse.json({ error: 'File must be an image' }, { status: 400 })
     }
 
-    if (file.size > maxSize) {
-      return NextResponse.json({
-        success: false,
-        error: 'File size too large. Maximum size is 10MB.'
-      }, { status: 400 });
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File size must be less than 10MB' }, { status: 400 })
     }
-
-    // Convert file to buffer
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
 
     // Upload to Cloudinary
-    const result = await uploadToCloudinary(buffer, 'blog-images');
+    const cloudinaryFormData = new FormData()
+    cloudinaryFormData.append('file', file)
+    cloudinaryFormData.append('upload_preset', 'admin-panel-uploads') // We'll create this preset
+    cloudinaryFormData.append('folder', 'admin-panel') // Organize uploads in a folder
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        url: result.secure_url,
-        publicId: result.public_id,
-        width: result.width,
-        height: result.height
+    const cloudinaryResponse = await fetch(
+      `https://api.cloudinary.com/v1_1/${process.env.CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: 'POST',
+        body: cloudinaryFormData,
       }
-    });
+    )
 
-  } catch (error) {
-    console.error('Upload error:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to upload image'
-    }, { status: 500 });
-  }
-}
-
-export async function DELETE(request: NextRequest) {
-  try {
-    // Check authentication with proper cookie name for production
-    const token = await getToken({
-      req: request,
-      secret: process.env.NEXTAUTH_SECRET,
-      cookieName: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token'
-    });
-
-    if (!token) {
-      return NextResponse.json({
-        success: false,
-        error: 'Authentication required. Please log in again.'
-      }, { status: 401 });
+    if (!cloudinaryResponse.ok) {
+      const errorData = await cloudinaryResponse.json()
+      console.error('Cloudinary upload error:', errorData)
+      return NextResponse.json({ error: 'Failed to upload image' }, { status: 500 })
     }
 
-    if (token.status !== 'active') {
-      return NextResponse.json({
-        success: false,
-        error: 'Account is disabled'
-      }, { status: 403 });
-    }
-
-    const { searchParams } = new URL(request.url);
-    const publicId = searchParams.get('publicId');
-
-    if (!publicId) {
-      return NextResponse.json({
-        success: false,
-        error: 'Public ID is required'
-      }, { status: 400 });
-    }
-
-    // Delete from Cloudinary
-    const { deleteFromCloudinary } = await import('@/lib/cloudinary');
-    await deleteFromCloudinary(publicId);
+    const cloudinaryData = await cloudinaryResponse.json()
 
     return NextResponse.json({
       success: true,
-      message: 'Image deleted successfully'
-    });
+      url: cloudinaryData.secure_url,
+      publicId: cloudinaryData.public_id
+    })
 
   } catch (error) {
-    console.error('Delete error:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to delete image'
-    }, { status: 500 });
+    console.error('Upload error:', error)
+    return NextResponse.json(
+      { error: 'Failed to upload image' },
+      { status: 500 }
+    )
   }
 }
