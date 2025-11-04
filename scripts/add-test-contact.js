@@ -10,7 +10,7 @@ const ContactMessageSchema = new mongoose.Schema({
   countryCode: { type: String, required: false, trim: true, maxlength: 10 },
   phoneCode: { type: String, required: false, trim: true, maxlength: 10 },
   phoneNumber: { type: String, required: false, trim: true, maxlength: 20 },
-  purpose: { type: String, required: false, trim: true, maxlength: 100 },
+
   message: { type: String, required: true, trim: true, maxlength: 2000 },
   status: { type: String, required: true, enum: ['unread', 'read', 'replied'], default: 'unread' }
 }, {
@@ -43,7 +43,6 @@ async function addTestContact() {
       country: 'United States',
       phoneCode: '+1',
       phoneNumber: '5555555555',
-      purpose: 'general',
       message: 'Testing contactmessages collection',
       status: 'unread'
     };
@@ -73,7 +72,6 @@ async function addTestContact() {
       country: contact.country,
       phoneCode: contact.phoneCode,
       phoneNumber: contact.phoneNumber,
-      purpose: contact.purpose,
       message: contact.message
     });
     

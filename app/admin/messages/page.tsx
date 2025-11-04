@@ -27,6 +27,7 @@ interface ContactMessage {
   firstName?: string
   lastName?: string
   email: string
+  company?: string
   country?: string
   countryCode?: string
   phoneCode?: string
@@ -167,11 +168,12 @@ export default function MessagesPage() {
       (message.firstName && message.firstName.toLowerCase().includes(searchLower)) ||
       (message.lastName && message.lastName.toLowerCase().includes(searchLower)) ||
       (message.email && message.email.toLowerCase().includes(searchLower)) ||
+      (message.company && message.company.toLowerCase().includes(searchLower)) ||
       (message.country && message.country.toLowerCase().includes(searchLower)) ||
       (message.phoneNumber && message.phoneNumber.toLowerCase().includes(searchLower)) ||
       (message.countryCode && message.countryCode.toLowerCase().includes(searchLower)) ||
       (message.phoneCode && message.phoneCode.toLowerCase().includes(searchLower)) ||
-      (message.purpose && message.purpose.toLowerCase().includes(searchLower)) ||
+
       (message.message && message.message.toLowerCase().includes(searchLower))
     );
   })
@@ -267,7 +269,7 @@ export default function MessagesPage() {
                 <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/40 w-5 h-5" />
                 <input
                   type="text"
-                  placeholder="Search by name, email, country, phone, purpose, or message content..."
+                  placeholder="Search by name, email, company, country, phone, or message content..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/40 focus:ring-2 focus:ring-[#44d1a1] focus:border-[#44d1a1]/50 backdrop-blur-md transition-all duration-200"
@@ -367,6 +369,9 @@ export default function MessagesPage() {
                                 : (message.name || 'Unknown')}
                             </span>
                             <p className="text-white/60 text-sm">{message.email || 'No email'}</p>
+                            {message.company && (
+                              <p className="text-white/50 text-sm">🏢 {message.company}</p>
+                            )}
                             {message.country && (
                               <p className="text-white/50 text-sm">📍 {message.country}</p>
                             )}
@@ -375,9 +380,7 @@ export default function MessagesPage() {
                                 📞 {message.phoneCode || message.countryCode} {message.phoneNumber}
                               </p>
                             )}
-                            {message.purpose && (
-                              <p className="text-white/50 text-sm">🎯 {message.purpose}</p>
-                            )}
+
                           </div>
                         </div>
                         <span className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${
@@ -562,6 +565,14 @@ export default function MessagesPage() {
                           <Clock className="h-4 w-4" /> 
                           <span>{formatDate(selectedMessage.createdAt)}</span>
                         </div>
+                        {selectedMessage.company && (
+                          <div className="flex items-center gap-2 text-white/70">
+                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                            </svg>
+                            <span className="truncate">{selectedMessage.company}</span>
+                          </div>
+                        )}
                         {selectedMessage.country && (
                           <div className="flex items-center gap-2 text-white/70">
                             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -570,14 +581,7 @@ export default function MessagesPage() {
                             <span className="truncate">{selectedMessage.country}</span>
                           </div>
                         )}
-                        {selectedMessage.purpose && (
-                          <div className="flex items-center gap-2 text-white/70">
-                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span className="truncate">{selectedMessage.purpose}</span>
-                          </div>
-                        )}
+
                       </div>
                     </motion.div>
 
@@ -614,6 +618,20 @@ export default function MessagesPage() {
                           </div>
                         </div>
                         
+                        {selectedMessage.company && (
+                          <div className="group flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
+                            <div className="grid h-9 w-9 place-items-center rounded-lg bg-white/5">
+                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                              </svg>
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-[11px] uppercase text-white/50">Company</p>
+                              <p className="truncate text-sm">{selectedMessage.company}</p>
+                            </div>
+                          </div>
+                        )}
+                        
                         {selectedMessage.country && (
                           <div className="group flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
                             <div className="grid h-9 w-9 place-items-center rounded-lg bg-white/5">
@@ -645,19 +663,7 @@ export default function MessagesPage() {
                           </div>
                         )}
                         
-                        {selectedMessage.purpose && (
-                          <div className="group flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
-                            <div className="grid h-9 w-9 place-items-center rounded-lg bg-white/5">
-                              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                              </svg>
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-[11px] uppercase text-white/50">Purpose</p>
-                              <p className="truncate text-sm">{selectedMessage.purpose}</p>
-                            </div>
-                          </div>
-                        )}
+
                         
                         <div className="group flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.03] p-3">
                           <div className="grid h-9 w-9 place-items-center rounded-lg bg-white/5">

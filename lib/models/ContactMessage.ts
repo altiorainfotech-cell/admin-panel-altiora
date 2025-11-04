@@ -6,11 +6,12 @@ export interface IContactMessage extends Document {
   firstName?: string;
   lastName?: string;
   email: string;
+  company?: string;
   country?: string;
   countryCode?: string;
   phoneCode?: string;
   phoneNumber?: string;
-  purpose?: string;
+
   message: string;
   status: 'unread' | 'read' | 'replied';
   createdAt: Date;
@@ -49,6 +50,12 @@ const ContactMessageSchema: Schema<IContactMessage> = new Schema({
       message: 'Please enter a valid email address'
     }
   },
+  company: {
+    type: String,
+    required: false,
+    trim: true,
+    maxlength: 100
+  },
   country: {
     type: String,
     required: false,
@@ -85,12 +92,7 @@ const ContactMessageSchema: Schema<IContactMessage> = new Schema({
       message: 'Please enter a valid phone number'
     }
   },
-  purpose: {
-    type: String,
-    required: false,
-    trim: true,
-    maxlength: 100
-  },
+
   message: {
     type: String,
     required: true,

@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, firstName, lastName, email, country, countryCode, phoneCode, phoneNumber, purpose, message } = body;
+    const { name, firstName, lastName, email, company, country, countryCode, phoneCode, phoneNumber, message } = body;
 
     // Debug logging
     console.log('📥 Received contact form data:', {
@@ -18,11 +18,11 @@ export async function POST(request: NextRequest) {
       firstName,
       lastName,
       email,
+      company,
       country,
       countryCode,
       phoneCode,
       phoneNumber,
-      purpose,
       message: message?.substring(0, 50) + '...'
     });
 
@@ -40,11 +40,11 @@ export async function POST(request: NextRequest) {
       firstName: firstName ? firstName.trim() : undefined,
       lastName: lastName ? lastName.trim() : undefined,
       email: email.trim().toLowerCase(),
+      company: company ? company.trim() : undefined,
       country: country ? country.trim() : undefined,
       countryCode: countryCode ? countryCode.trim() : undefined,
       phoneCode: phoneCode ? phoneCode.trim() : undefined,
       phoneNumber: phoneNumber ? phoneNumber.trim() : undefined,
-      purpose: purpose ? purpose.trim() : undefined,
       message: message.trim()
     };
 
@@ -58,11 +58,11 @@ export async function POST(request: NextRequest) {
       id: contactMessage._id,
       firstName: contactMessage.firstName,
       lastName: contactMessage.lastName,
+      company: contactMessage.company,
       country: contactMessage.country,
       countryCode: contactMessage.countryCode,
       phoneCode: contactMessage.phoneCode,
-      phoneNumber: contactMessage.phoneNumber,
-      purpose: contactMessage.purpose
+      phoneNumber: contactMessage.phoneNumber
     });
 
     return NextResponse.json(
